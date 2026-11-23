@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ServerWatch — Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-name">ServerWatch</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item active"><span class="nav-icon">▦</span><span>Dashboard</span></a>
+      <a href="snmp.html" class="nav-item"><span class="nav-icon">◉</span><span>Analisis SNMP</span></a>
+      <a href="maintenance.html" class="nav-item"><span class="nav-icon">⚙</span><span>Maintenance</span></a>
+      <a href="nettools.html" class="nav-item"><span class="nav-icon">⌁</span><span>Network Tools</span></a>
+      <a href="tickets.html" class="nav-item"><span class="nav-icon">◧</span><span>Tiket Insiden</span></a>
+      <a href="profile.html" class="nav-item"><span class="nav-icon">◈</span><span>Profil & Server</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="ops-badge">
+        <div class="ops-avatar" id="sidebarAvatar">IT</div>
+        <div class="ops-info">
+          <span class="ops-name" id="sidebarName">IT Ops</span>
+          <span class="ops-role">Administrator</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-wrapper">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-sidebar" id="toggleSidebar">☰</button>
+        <div class="breadcrumb">
+          <span>Dashboard</span>
+          <span class="bc-sep">/</span>
+          <span class="bc-current">Overview</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="live-clock" id="liveClock"></div>
+        <button class="btn-refresh" id="btnRefreshAll" title="Refresh semua server">↻ Refresh</button>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+      <!-- Stats Cards -->
+      <section class="stats-row" id="statsRow">
+        <div class="stat-card">
+          <div class="stat-label">Total Server</div>
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-sub">terdaftar</div>
+        </div>
+        <div class="stat-card online">
+          <div class="stat-label">Online</div>
+          <div class="stat-value" id="statOnline">0</div>
+          <div class="stat-sub">server aktif</div>
+        </div>
+        <div class="stat-card offline">
+          <div class="stat-label">Offline</div>
+          <div class="stat-value" id="statOffline">0</div>
+          <div class="stat-sub">tidak merespons</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-label">Warning</div>
+          <div class="stat-value" id="statWarning">0</div>
+          <div class="stat-sub">latensi tinggi</div>
+        </div>
+      </section>
+
+      <!-- Filter & Search -->
+      <section class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input type="text" id="searchInput" class="search-input" placeholder="Cari server, domain, atau IP..." />
+        </div>
+        <div class="filter-group">
+          <button class="filter-btn active" data-filter="all">Semua</button>
+          <button class="filter-btn" data-filter="online">Online</button>
+          <button class="filter-btn" data-filter="offline">Offline</button>
+          <button class="filter-btn" data-filter="warning">Warning</button>
+        </div>
+      </section>
+
+      <!-- Server Table -->
+      <section class="table-section">
+        <div class="table-header">
+          <h2 class="section-title">Daftar Server</h2>
+          <span class="last-updated">Diperbarui: <span id="lastUpdated">—</span></span>
+        </div>
+        <div class="table-wrap">
+          <table class="server-table" id="serverTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nama Server</th>
+                <th>Domain</th>
+                <th>IP Address</th>
+                <th>Jenis</th>
+                <th>Status</th>
+                <th>Ping</th>
+                <th>Uptime</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="serverTbody">
+              <!-- Rows injected by JS -->
+            </tbody>
+          </table>
+          <div class="empty-state" id="emptyState" style="display:none;">
+            <div class="empty-icon">◎</div>
+            <p>Belum ada server terdaftar.</p>
+            <a href="profile.html" class="btn-add-link">+ Tambah Server</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Activity Log -->
+      <section class="log-section">
+        <div class="table-header">
+          <h2 class="section-title">Log Aktivitas</h2>
+          <button class="btn-clear-log" id="btnClearLog">Bersihkan</button>
+        </div>
+        <div class="log-wrap" id="activityLog">
+          <div class="log-empty">Belum ada aktivitas tercatat.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Ping Detail Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Detail Server</h3>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

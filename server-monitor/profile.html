@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ServerWatch — Profil & Server</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-name">ServerWatch</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">▦</span><span>Dashboard</span></a>
+      <a href="snmp.html" class="nav-item"><span class="nav-icon">◉</span><span>Analisis SNMP</span></a>
+      <a href="maintenance.html" class="nav-item"><span class="nav-icon">⚙</span><span>Maintenance</span></a>
+      <a href="nettools.html" class="nav-item"><span class="nav-icon">⌁</span><span>Network Tools</span></a>
+      <a href="tickets.html" class="nav-item"><span class="nav-icon">◧</span><span>Tiket Insiden</span></a>
+      <a href="profile.html" class="nav-item active"><span class="nav-icon">◈</span><span>Profil & Server</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="ops-badge">
+        <div class="ops-avatar" id="sidebarAvatar">IT</div>
+        <div class="ops-info">
+          <span class="ops-name" id="sidebarName">IT Ops</span>
+          <span class="ops-role">Administrator</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-wrapper">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-sidebar" id="toggleSidebar">☰</button>
+        <div class="breadcrumb">
+          <span>Dashboard</span>
+          <span class="bc-sep">/</span>
+          <span class="bc-current">Profil & Server</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="live-clock" id="liveClock"></div>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- Profile Section -->
+      <section class="profile-section">
+        <div class="profile-card">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar" id="profileAvatar">IT</div>
+            <button class="btn-change-avatar" id="btnChangeAvatar" title="Ubah inisial">✎</button>
+          </div>
+          <div class="profile-details">
+            <div class="profile-field">
+              <label>Nama Lengkap</label>
+              <div class="editable-wrap">
+                <span class="editable-val" id="displayName">IT Ops Engineer</span>
+                <button class="btn-edit" data-target="displayName" data-field="name">✎</button>
+              </div>
+            </div>
+            <div class="profile-field">
+              <label>Username</label>
+              <div class="editable-wrap">
+                <span class="editable-val" id="displayUsername">itops</span>
+                <button class="btn-edit" data-target="displayUsername" data-field="username">✎</button>
+              </div>
+            </div>
+            <div class="profile-field">
+              <label>Email</label>
+              <div class="editable-wrap">
+                <span class="editable-val" id="displayEmail">itops@company.internal</span>
+                <button class="btn-edit" data-target="displayEmail" data-field="email">✎</button>
+              </div>
+            </div>
+            <div class="profile-field">
+              <label>Divisi</label>
+              <div class="editable-wrap">
+                <span class="editable-val" id="displayDivision">Infrastructure & Operations</span>
+                <button class="btn-edit" data-target="displayDivision" data-field="division">✎</button>
+              </div>
+            </div>
+            <div class="profile-field">
+              <label>Deskripsi</label>
+              <div class="editable-wrap">
+                <span class="editable-val" id="displayBio">Bertanggung jawab atas pengelolaan dan pemantauan infrastruktur server perusahaan.</span>
+                <button class="btn-edit" data-target="displayBio" data-field="bio">✎</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Add Server Section -->
+      <section class="add-server-section">
+        <div class="section-header-row">
+          <h2 class="section-title">Manajemen Server</h2>
+          <button class="btn-primary" id="btnToggleForm">+ Tambah Server</button>
+        </div>
+
+        <!-- Add Server Form -->
+        <div class="add-form-wrap" id="addFormWrap" style="display:none;">
+          <form class="add-server-form" id="addServerForm" novalidate>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="fName">Nama Server <span class="req">*</span></label>
+                <input type="text" id="fName" placeholder="cth: Web Server Utama" />
+                <span class="field-err" id="errName"></span>
+              </div>
+              <div class="form-group">
+                <label for="fDomain">Domain <span class="req">*</span></label>
+                <input type="text" id="fDomain" placeholder="cth: web.company.com" />
+                <span class="field-err" id="errDomain"></span>
+              </div>
+              <div class="form-group">
+                <label for="fIP">IP Address <span class="req">*</span></label>
+                <input type="text" id="fIP" placeholder="cth: 192.168.1.10" />
+                <span class="field-err" id="errIP"></span>
+              </div>
+              <div class="form-group">
+                <label for="fType">Jenis Server <span class="req">*</span></label>
+                <select id="fType">
+                  <option value="">— Pilih Jenis —</option>
+                  <option value="Web">Web</option>
+                  <option value="Database">Database</option>
+                  <option value="Mail">Mail</option>
+                  <option value="DNS">DNS</option>
+                  <option value="Storage">Storage</option>
+                  <option value="Proxy">Proxy</option>
+                  <option value="App">Application</option>
+                  <option value="Monitoring">Monitoring</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+                <span class="field-err" id="errType"></span>
+              </div>
+              <div class="form-group">
+                <label for="fLocation">Lokasi / Rack</label>
+                <input type="text" id="fLocation" placeholder="cth: DC Jakarta Rack-A3" />
+              </div>
+              <div class="form-group">
+                <label for="fOS">Sistem Operasi</label>
+                <input type="text" id="fOS" placeholder="cth: Ubuntu 22.04 LTS" />
+              </div>
+              <div class="form-group form-group--full">
+                <label for="fNotes">Catatan</label>
+                <textarea id="fNotes" rows="2" placeholder="Informasi tambahan tentang server ini..."></textarea>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" id="btnCancelForm">Batal</button>
+              <button type="submit" class="btn-primary">Simpan Server</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Registered Server List (card view) -->
+        <div class="server-cards" id="serverCards">
+          <!-- Injected by JS -->
+        </div>
+        <div class="empty-state" id="emptyStateProfile" style="display:none;">
+          <div class="empty-icon">◎</div>
+          <p>Belum ada server yang ditambahkan.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal modal--sm">
+      <div class="modal-header">
+        <h3 id="modalTitle">Edit Profil</h3>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Server Modal -->
+  <div class="modal-overlay" id="editServerOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Edit Server</h3>
+        <button class="modal-close" id="editServerClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <form class="add-server-form" id="editServerForm" novalidate>
+          <input type="hidden" id="editServerId" />
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="efName">Nama Server <span class="req">*</span></label>
+              <input type="text" id="efName" />
+              <span class="field-err" id="eerrName"></span>
+            </div>
+            <div class="form-group">
+              <label for="efDomain">Domain <span class="req">*</span></label>
+              <input type="text" id="efDomain" />
+              <span class="field-err" id="eerrDomain"></span>
+            </div>
+            <div class="form-group">
+              <label for="efIP">IP Address <span class="req">*</span></label>
+              <input type="text" id="efIP" />
+              <span class="field-err" id="eerrIP"></span>
+            </div>
+            <div class="form-group">
+              <label for="efType">Jenis Server <span class="req">*</span></label>
+              <select id="efType">
+                <option value="">— Pilih Jenis —</option>
+                <option value="Web">Web</option>
+                <option value="Database">Database</option>
+                <option value="Mail">Mail</option>
+                <option value="DNS">DNS</option>
+                <option value="Storage">Storage</option>
+                <option value="Proxy">Proxy</option>
+                <option value="App">Application</option>
+                <option value="Monitoring">Monitoring</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+              <span class="field-err" id="eerrType"></span>
+            </div>
+            <div class="form-group">
+              <label for="efLocation">Lokasi / Rack</label>
+              <input type="text" id="efLocation" />
+            </div>
+            <div class="form-group">
+              <label for="efOS">Sistem Operasi</label>
+              <input type="text" id="efOS" />
+            </div>
+            <div class="form-group form-group--full">
+              <label for="efNotes">Catatan</label>
+              <textarea id="efNotes" rows="2"></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" id="btnCancelEdit">Batal</button>
+            <button type="submit" class="btn-primary">Simpan Perubahan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

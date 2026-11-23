@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ServerWatch — Network Tools</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-name">ServerWatch</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">▦</span><span>Dashboard</span></a>
+      <a href="snmp.html" class="nav-item"><span class="nav-icon">◉</span><span>Analisis SNMP</span></a>
+      <a href="maintenance.html" class="nav-item"><span class="nav-icon">⚙</span><span>Maintenance</span></a>
+      <a href="nettools.html" class="nav-item active"><span class="nav-icon">⌁</span><span>Network Tools</span></a>
+      <a href="tickets.html" class="nav-item"><span class="nav-icon">◧</span><span>Tiket Insiden</span></a>
+      <a href="profile.html" class="nav-item"><span class="nav-icon">◈</span><span>Profil & Server</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="ops-badge">
+        <div class="ops-avatar" id="sidebarAvatar">IT</div>
+        <div class="ops-info">
+          <span class="ops-name" id="sidebarName">IT Ops</span>
+          <span class="ops-role">Administrator</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-sidebar" id="toggleSidebar">☰</button>
+        <div class="breadcrumb">
+          <span>Dashboard</span><span class="bc-sep">/</span>
+          <span class="bc-current">Network Tools</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="live-clock" id="liveClock"></div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Tool Tabs -->
+      <div class="nt-tabs-bar">
+        <button class="nt-tab active" data-tool="ping">⬤ Ping Checker</button>
+        <button class="nt-tab" data-tool="traceroute">⌁ Traceroute</button>
+        <button class="nt-tab" data-tool="portscan">⊞ Port Scanner</button>
+        <button class="nt-tab" data-tool="dns">◎ DNS Lookup</button>
+        <button class="nt-tab" data-tool="ssl">🔒 SSL/TLS Check</button>
+        <button class="nt-tab" data-tool="whois">◇ WHOIS</button>
+        <button class="nt-tab" data-tool="bandwidth">▲ Bandwidth Est.</button>
+      </div>
+
+      <!-- Tool Panels -->
+      <div class="nt-panels">
+
+        <!-- PING -->
+        <div class="nt-panel active" id="panel-ping">
+          <div class="nt-tool-card">
+            <div class="nt-tool-header">
+              <div>
+                <h2 class="nt-tool-title">Ping Checker</h2>
+                <p class="nt-tool-desc">Simulasi ping ke satu atau banyak host sekaligus. Hasil meliputi latency, packet loss, dan jitter.</p>
+              </div>
+              <button class="btn-ghost" id="pingLoadServers">⬇ Load dari Server List</button>
+            </div>
+            <div class="nt-input-row">
+              <div class="form-group" style="flex:1">
+                <label for="pingTargets">Host / IP (pisahkan dengan koma atau baris baru)</label>
+                <textarea id="pingTargets" rows="3" placeholder="192.168.1.10&#10;web.company.com&#10;8.8.8.8"></textarea>
+              </div>
+              <div class="form-group" style="width:120px">
+                <label for="pingCount">Jumlah Ping</label>
+                <select id="pingCount">
+                  <option value="4">4x</option>
+                  <option value="8" selected>8x</option>
+                  <option value="16">16x</option>
+                  <option value="32">32x</option>
+                </select>
+              </div>
+              <div class="nt-run-wrap">
+                <button class="btn-primary nt-run-btn" id="btnRunPing">▶ Jalankan</button>
+              </div>
+            </div>
+            <div class="nt-result-area" id="pingResult"></div>
+          </div>
+        </div>
+
+        <!-- TRACEROUTE -->
+        <div class="nt-panel" id="panel-traceroute">
+          <div class="nt-tool-card">
+            <div class="nt-tool-header">
+              <div>
+                <h2 class="nt-tool-title">Traceroute Simulator</h2>
+                <p class="nt-tool-desc">Telusuri jalur routing ke host tujuan dengan simulasi hop latency per TTL.</p>
+              </div>
+            </div>
+            <div class="nt-input-row">
+              <div class="form-group" style="flex:1">
+                <label for="traceTarget">Target Host / IP</label>
+                <input type="text" id="traceTarget" placeholder="cth: 8.8.8.8 atau google.com" />
+              </div>
+              <div class="form-group" style="width:120px">
+                <label for="traceMaxHop">Max Hops</label>
+                <select id="traceMaxHop">
+                  <option value="10">10</option>
+                  <option value="15" selected>15</option>
+                  <option value="30">30</option>
+                </select>
+              </div>
+              <div class="nt-run-wrap">
+                <button class="btn-primary nt-run-btn" id="btnRunTrace">▶ Jalankan</button>
+              </div>
+            </div>
+            <div class="nt-result-area" id="traceResult"></div>
+          </div>
+        </div>
+
+        <!-- PORT SCANNER -->
+        <div class="nt-panel" id="panel-portscan">
+          <div class="nt-tool-card">
+            <div class="nt-tool-header">
+              <div>
+                <h2 class="nt-tool-title">Port Scanner</h2>
+                <p class="nt-tool-desc">Periksa port yang terbuka pada sebuah host. Mendukung scan preset (web, database, mail) atau port kustom.</p>
+              </div>
+            </div>
+            <div class="nt-input-row">
+              <div class="form-group" style="flex:1">
+                <label for="psHost">Target Host / IP</label>
+                <input type="text" id="psHost" placeholder="cth: 192.168.1.10" />
+              </div>
+              <div class="form-group" style="flex:1">
+                <label for="psPreset">Preset Port</label>
+                <select id="psPreset">
+                  <option value="web">Web (80, 443, 8080, 8443)</option>
+                  <option value="database">Database (3306, 5432, 1433, 6379, 27017)</option>
+                  <option value="mail">Mail (25, 465, 587, 110, 143, 993, 995)</option>
+                  <option value="remote">Remote (22, 23, 3389, 5900)</option>
+                  <option value="dns">DNS & Network (53, 123, 161, 162)</option>
+                  <option value="custom">Custom...</option>
+                </select>
+              </div>
+              <div class="form-group" id="psCustomWrap" style="flex:1;display:none;">
+                <label for="psCustom">Port Kustom (cth: 80,443,8080)</label>
+                <input type="text" id="psCustom" placeholder="80,443,8080" />
+              </div>
+              <div class="nt-run-wrap">
+                <button class="btn-primary nt-run-btn" id="btnRunPS">▶ Scan</button>
+              </div>
+            </div>
+            <div class="nt-result-area" id="psResult"></div>
+          </div>
+        </div>
+
+        <!-- DNS LOOKUP -->
+        <div class="nt-panel" id="panel-dns">
+          <div class="nt-tool-card">
+            <div class="nt-tool-header">
+              <div>
+                <h2 class="nt-tool-title">DNS Lookup</h2>
+                <p class="nt-tool-desc">Simulasi resolusi DNS untuk berbagai tipe record: A, AAAA, MX, NS, TXT, CNAME, PTR.</p>
+              </div>
+            </div>
+            <div class="nt-input-row">
+              <div class="form-group" style="flex:1">
+                <label for="dnsTarget">Domain / IP</label>
+                <input type="text" id="dnsTarget" placeholder="cth: company.com atau 192.168.1.10" />
+              </div>
+              <div class="form-group" style="width:140px">
+                <label for="dnsType">Record Type</label>
+                <select id="dnsType">
+                  <option value="ALL">ALL</option>
+                  <option value="A">A</option>
+                  <option value="AAAA">AAAA</option>
+                  <option value="MX">MX</option>
+                  <option value="NS">NS</option>
+                  <option value="TXT">TXT</option>
+                  <option value="CNAME">CNAME</option>
+                  <option value="PTR">PTR (Reverse)</option>
+                  <option value="SOA">SOA</option>
+                </select>
+              </div>
+              <div class="form-group" style="width:140px">
+                <label for="dnsServer">DNS Server</label>
+                <select id="dnsServer">
+                  <option value="8.8.8.8">Google (8.8.8.8)</option>
+                  <option value="1.1.1.1">Cloudflare (1.1.1.1)</option>
+                  <option value="208.67.222.222">OpenDNS</option>
+                  <option value="local">Local Resolver</option>
+                </select>
+              </div>
+              <div class="nt-run-wrap">
+                <button class="btn-primary nt-run-btn" id="btnRunDNS">▶ Lookup</button>
+              </div>
+            </div>
+            <div class="nt-result-area" id="dnsResult"></div>
+          </div>
+        </div>
+
+        <!-- SSL CHECK -->
+        <div class="nt-panel" id="panel-ssl">
+          <div class="nt-tool-card">
+            <div class="nt-tool-header">
+              <div>
+                <h2 class="nt-tool-title">SSL/TLS Certificate Checker</h2>
+                <p class="nt-tool-desc">Periksa validitas sertifikat SSL domain, tanggal kedaluwarsa, cipher suite, dan chain trust.</p>
+              </div>
+              <button class="btn-ghost" id="sslLoadDomains">⬇ Load dari Server List</button>
+            </div>
+            <div class="nt-input-row">
+              <div class="form-group" style="flex:1">
+                <label for="sslTargets">Domain (pisahkan koma atau baris baru)</label>
+                <textarea id="sslTargets" rows="2" placeholder="web.company.com&#10;mail.company.com"></textarea>
+              </div>
+              <div class="nt-run-wrap">
+                <button class="btn-primary nt-run-btn" id="btnRunSSL">▶ Check</button>
+              </div>
+            </div>
+            <div class="nt-result-area" id="sslResult"></div>
+          </div>
+        </div>
+
+        <!-- WHOIS -->
+        <div class="nt-panel" id="panel-whois">
+          <div class="nt-tool-card">
+            <div class="nt-tool-header">
+              <div>
+                <h2 class="nt-tool-title">WHOIS Lookup</h2>
+                <p class="nt-tool-desc">Periksa informasi registrasi domain, pemilik, tanggal expire, dan nameserver.</p>
+              </div>
+            </div>
+            <div class="nt-input-row">
+              <div class="form-group" style="flex:1">
+                <label for="whoisTarget">Domain</label>
+                <input type="text" id="whoisTarget" placeholder="cth: company.com" />
+              </div>
+              <div class="nt-run-wrap">
+                <button class="btn-primary nt-run-btn" id="btnRunWhois">▶ Lookup</button>
+              </div>
+            </div>
+            <div class="nt-result-area" id="whoisResult"></div>
+          </div>
+        </div>
+
+        <!-- BANDWIDTH -->
+        <div class="nt-panel" id="panel-bandwidth">
+          <div class="nt-tool-card">
+            <div class="nt-tool-header">
+              <div>
+                <h2 class="nt-tool-title">Bandwidth Estimator</h2>
+                <p class="nt-tool-desc">Hitung estimasi kebutuhan bandwidth berdasarkan jumlah pengguna, jenis layanan, dan kualitas yang diinginkan.</p>
+              </div>
+            </div>
+            <div class="form-grid" style="margin-bottom:1rem;">
+              <div class="form-group">
+                <label for="bwUsers">Jumlah Pengguna Bersamaan</label>
+                <input type="number" id="bwUsers" value="50" min="1" />
+              </div>
+              <div class="form-group">
+                <label for="bwService">Jenis Layanan Utama</label>
+                <select id="bwService">
+                  <option value="web">Web Browsing</option>
+                  <option value="video">Video Streaming HD</option>
+                  <option value="voip">VoIP / Video Call</option>
+                  <option value="fileshare">File Transfer / Backup</option>
+                  <option value="erp">ERP / Database App</option>
+                  <option value="mixed">Mixed (Semua)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="bwQuality">Kualitas yang Diinginkan</label>
+                <select id="bwQuality">
+                  <option value="basic">Basic (minimum)</option>
+                  <option value="standard" selected>Standard</option>
+                  <option value="premium">Premium (high availability)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="bwRedundancy">Faktor Redundansi</label>
+                <select id="bwRedundancy">
+                  <option value="1.2">20% overhead</option>
+                  <option value="1.5" selected>50% overhead (recommended)</option>
+                  <option value="2">100% overhead (HA)</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;">
+              <button class="btn-primary" id="btnCalcBW">⌗ Hitung Estimasi</button>
+            </div>
+            <div class="nt-result-area" id="bwResult"></div>
+          </div>
+        </div>
+
+      </div><!-- end nt-panels -->
+
+      <!-- Tool History -->
+      <section class="table-section">
+        <div class="table-header">
+          <h2 class="section-title">Riwayat Penggunaan Tools</h2>
+          <button class="btn-clear-log" id="btnClearNTHistory">Bersihkan</button>
+        </div>
+        <div class="log-wrap" id="ntHistoryLog">
+          <div class="log-empty">Belum ada riwayat penggunaan.</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="app.js"></script>
+  <script src="nettools.js"></script>
+</body>
+</html>

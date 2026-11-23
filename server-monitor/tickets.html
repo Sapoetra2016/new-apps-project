@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ServerWatch — Tiket Insiden</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-name">ServerWatch</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">▦</span><span>Dashboard</span></a>
+      <a href="snmp.html" class="nav-item"><span class="nav-icon">◉</span><span>Analisis SNMP</span></a>
+      <a href="maintenance.html" class="nav-item"><span class="nav-icon">⚙</span><span>Maintenance</span></a>
+      <a href="nettools.html" class="nav-item"><span class="nav-icon">⌁</span><span>Network Tools</span></a>
+      <a href="tickets.html" class="nav-item active"><span class="nav-icon">◧</span><span>Tiket Insiden</span></a>
+      <a href="profile.html" class="nav-item"><span class="nav-icon">◈</span><span>Profil & Server</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="ops-badge">
+        <div class="ops-avatar" id="sidebarAvatar">IT</div>
+        <div class="ops-info">
+          <span class="ops-name" id="sidebarName">IT Ops</span>
+          <span class="ops-role">Administrator</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-sidebar" id="toggleSidebar">☰</button>
+        <div class="breadcrumb">
+          <span>Dashboard</span><span class="bc-sep">/</span>
+          <span class="bc-current">Tiket Insiden</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="live-clock" id="liveClock"></div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Stats -->
+      <section class="stats-row">
+        <div class="stat-card"><div class="stat-label">Total Tiket</div><div class="stat-value" id="tkTotal">0</div><div class="stat-sub">semua waktu</div></div>
+        <div class="stat-card offline"><div class="stat-label">Open</div><div class="stat-value" id="tkOpen">0</div><div class="stat-sub">belum selesai</div></div>
+        <div class="stat-card warning"><div class="stat-label">In Progress</div><div class="stat-value" id="tkInProgress">0</div><div class="stat-sub">sedang dikerjakan</div></div>
+        <div class="stat-card online"><div class="stat-label">Resolved</div><div class="stat-value" id="tkResolved">0</div><div class="stat-sub">selesai</div></div>
+      </section>
+
+      <!-- SLA Bar -->
+      <div class="tk-sla-bar" id="tkSLABar"></div>
+
+      <!-- Toolbar -->
+      <section class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input type="text" id="tkSearch" class="search-input" placeholder="Cari tiket, server, atau PIC..." />
+        </div>
+        <div class="filter-group">
+          <button class="filter-btn active" data-tkfilter="all">Semua</button>
+          <button class="filter-btn" data-tkfilter="open">Open</button>
+          <button class="filter-btn" data-tkfilter="in-progress">In Progress</button>
+          <button class="filter-btn" data-tkfilter="resolved">Resolved</button>
+          <button class="filter-btn" data-tkfilter="closed">Closed</button>
+        </div>
+        <div class="filter-group">
+          <button class="filter-btn" data-tkpriority="critical">🔴 Critical</button>
+          <button class="filter-btn" data-tkpriority="high">🟠 High</button>
+          <button class="filter-btn" data-tkpriority="medium">🟡 Medium</button>
+          <button class="filter-btn" data-tkpriority="low">🟢 Low</button>
+        </div>
+        <button class="btn-primary" id="btnNewTicket">+ Buat Tiket</button>
+      </section>
+
+      <!-- Ticket Board (Kanban-style) -->
+      <div class="tk-board" id="tkBoard">
+        <div class="tk-col" id="col-open">
+          <div class="tk-col-header">
+            <span class="tk-col-title">🔴 Open</span>
+            <span class="tk-col-count" id="colCountOpen">0</span>
+          </div>
+          <div class="tk-col-cards" id="cards-open"></div>
+        </div>
+        <div class="tk-col" id="col-in-progress">
+          <div class="tk-col-header">
+            <span class="tk-col-title">🟡 In Progress</span>
+            <span class="tk-col-count" id="colCountInProgress">0</span>
+          </div>
+          <div class="tk-col-cards" id="cards-in-progress"></div>
+        </div>
+        <div class="tk-col" id="col-resolved">
+          <div class="tk-col-header">
+            <span class="tk-col-title">🟢 Resolved</span>
+            <span class="tk-col-count" id="colCountResolved">0</span>
+          </div>
+          <div class="tk-col-cards" id="cards-resolved"></div>
+        </div>
+        <div class="tk-col" id="col-closed">
+          <div class="tk-col-header">
+            <span class="tk-col-title">⚫ Closed</span>
+            <span class="tk-col-count" id="colCountClosed">0</span>
+          </div>
+          <div class="tk-col-cards" id="cards-closed"></div>
+        </div>
+      </div>
+
+      <!-- Empty state for board -->
+      <div class="empty-state" id="tkEmpty" style="display:none;">
+        <div class="empty-icon">◧</div>
+        <p>Belum ada tiket insiden.</p>
+      </div>
+
+      <!-- MTR (Mean Time to Resolve) Stats -->
+      <section class="table-section" id="tkMTRSection">
+        <div class="table-header">
+          <h2 class="section-title">Statistik Penanganan Insiden</h2>
+        </div>
+        <div class="tk-mtr-grid" id="tkMTRGrid"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- New/Edit Ticket Modal -->
+  <div class="modal-overlay" id="tkModalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="tkModalTitle">Buat Tiket Insiden</h3>
+        <button class="modal-close" id="tkModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="tkForm" novalidate>
+          <input type="hidden" id="tkEditId" />
+          <div class="form-grid">
+            <div class="form-group form-group--full">
+              <label for="tkTitle">Judul Insiden <span class="req">*</span></label>
+              <input type="text" id="tkTitle" placeholder="cth: Web server tidak bisa diakses dari internet" />
+              <span class="field-err" id="tkErrTitle"></span>
+            </div>
+            <div class="form-group form-group--full">
+              <label for="tkDesc">Deskripsi Detail <span class="req">*</span></label>
+              <textarea id="tkDesc" rows="3" placeholder="Deskripsikan gejala, dampak, waktu pertama kali ditemukan..."></textarea>
+              <span class="field-err" id="tkErrDesc"></span>
+            </div>
+            <div class="form-group">
+              <label for="tkPriority">Prioritas <span class="req">*</span></label>
+              <select id="tkPriority">
+                <option value="critical">🔴 Critical — Layanan Down Total</option>
+                <option value="high">🟠 High — Dampak Signifikan</option>
+                <option value="medium" selected>🟡 Medium — Degradasi Parsial</option>
+                <option value="low">🟢 Low — Minor / Informatif</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="tkCategory">Kategori</label>
+              <select id="tkCategory">
+                <option value="Network">Network / Konektivitas</option>
+                <option value="Server">Server / Hardware</option>
+                <option value="Application">Aplikasi / Software</option>
+                <option value="Database">Database</option>
+                <option value="Security">Security / Intrusion</option>
+                <option value="Backup">Backup / Recovery</option>
+                <option value="Performance">Performance Degradation</option>
+                <option value="Other">Lainnya</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="tkAssignedServer">Server Terkait</label>
+              <select id="tkAssignedServer">
+                <option value="">— Tidak ada / Tidak diketahui —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="tkPIC">Assigned To (PIC)</label>
+              <input type="text" id="tkPIC" placeholder="cth: Budi / Tim NOC" />
+            </div>
+            <div class="form-group">
+              <label for="tkStatus">Status Awal</label>
+              <select id="tkStatus">
+                <option value="open">Open</option>
+                <option value="in-progress">In Progress</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="tkSLA">SLA Target</label>
+              <select id="tkSLA">
+                <option value="1">1 jam (Critical SLA)</option>
+                <option value="4">4 jam</option>
+                <option value="8" selected>8 jam (Bisnis)</option>
+                <option value="24">24 jam</option>
+                <option value="72">3 hari</option>
+              </select>
+            </div>
+            <div class="form-group form-group--full">
+              <label for="tkSteps">Langkah Penanganan (opsional)</label>
+              <textarea id="tkSteps" rows="2" placeholder="Langkah yang sudah/akan dilakukan..."></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" id="tkFormCancel">Batal</button>
+            <button type="submit" class="btn-primary" id="tkFormSubmit">Buat Tiket</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticket Detail Modal -->
+  <div class="modal-overlay" id="tkDetailOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="tkDetailTitle">Detail Tiket</h3>
+        <button class="modal-close" id="tkDetailClose">✕</button>
+      </div>
+      <div class="modal-body" id="tkDetailBody"></div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="app.js"></script>
+  <script src="tickets.js"></script>
+</body>
+</html>

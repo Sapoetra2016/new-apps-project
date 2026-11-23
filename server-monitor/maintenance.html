@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ServerWatch — Maintenance & Change</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-name">ServerWatch</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><span class="nav-icon">▦</span><span>Dashboard</span></a>
+      <a href="snmp.html" class="nav-item"><span class="nav-icon">◉</span><span>Analisis SNMP</span></a>
+      <a href="maintenance.html" class="nav-item active"><span class="nav-icon">⚙</span><span>Maintenance</span></a>
+      <a href="nettools.html" class="nav-item"><span class="nav-icon">⌁</span><span>Network Tools</span></a>
+      <a href="tickets.html" class="nav-item"><span class="nav-icon">◧</span><span>Tiket Insiden</span></a>
+      <a href="profile.html" class="nav-item"><span class="nav-icon">◈</span><span>Profil & Server</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="ops-badge">
+        <div class="ops-avatar" id="sidebarAvatar">IT</div>
+        <div class="ops-info">
+          <span class="ops-name" id="sidebarName">IT Ops</span>
+          <span class="ops-role">Administrator</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-sidebar" id="toggleSidebar">☰</button>
+        <div class="breadcrumb">
+          <span>Dashboard</span><span class="bc-sep">/</span>
+          <span class="bc-current">Maintenance & Change Management</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="live-clock" id="liveClock"></div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Stats -->
+      <section class="stats-row">
+        <div class="stat-card"><div class="stat-label">Total Window</div><div class="stat-value" id="mwTotal">0</div><div class="stat-sub">terjadwal</div></div>
+        <div class="stat-card warning"><div class="stat-label">Mendatang</div><div class="stat-value" id="mwUpcoming">0</div><div class="stat-sub">dalam 7 hari</div></div>
+        <div class="stat-card online"><div class="stat-label">Selesai</div><div class="stat-value" id="mwDone">0</div><div class="stat-sub">completed</div></div>
+        <div class="stat-card offline"><div class="stat-label">Dibatalkan</div><div class="stat-value" id="mwCancelled">0</div><div class="stat-sub">cancelled</div></div>
+      </section>
+
+      <!-- Countdown Banner -->
+      <div id="mwCountdownBanner" style="display:none;"></div>
+
+      <!-- Toolbar -->
+      <section class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input type="text" id="mwSearch" class="search-input" placeholder="Cari maintenance window..." />
+        </div>
+        <div class="filter-group">
+          <button class="filter-btn active" data-mwfilter="all">Semua</button>
+          <button class="filter-btn" data-mwfilter="scheduled">Scheduled</button>
+          <button class="filter-btn" data-mwfilter="in-progress">In Progress</button>
+          <button class="filter-btn" data-mwfilter="completed">Completed</button>
+          <button class="filter-btn" data-mwfilter="cancelled">Cancelled</button>
+        </div>
+        <button class="btn-primary" id="btnNewMW">+ Jadwalkan</button>
+      </section>
+
+      <!-- Maintenance Table -->
+      <section class="table-section">
+        <div class="table-header">
+          <h2 class="section-title">Jadwal Maintenance Window</h2>
+          <span class="last-updated">Kalender: <a href="#" id="btnExportCal" class="link-muted">Export iCal</a></span>
+        </div>
+        <div class="table-wrap">
+          <table class="server-table" id="mwTable">
+            <thead>
+              <tr>
+                <th>#</th><th>Judul / Deskripsi</th><th>Server Terdampak</th>
+                <th>Mulai</th><th>Selesai</th><th>Tipe</th>
+                <th>PIC</th><th>Status</th><th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="mwTbody"></tbody>
+          </table>
+          <div class="empty-state" id="mwEmpty" style="display:none;">
+            <div class="empty-icon">⚙</div>
+            <p>Belum ada maintenance window terjadwal.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Change Log Timeline -->
+      <section class="table-section">
+        <div class="table-header">
+          <h2 class="section-title">Change Log Timeline</h2>
+          <button class="btn-clear-log" id="btnClearCL">Bersihkan</button>
+        </div>
+        <div class="mw-timeline" id="mwTimeline">
+          <div class="log-empty">Belum ada perubahan tercatat.</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- New/Edit MW Modal -->
+  <div class="modal-overlay" id="mwModalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="mwModalTitle">Jadwalkan Maintenance Window</h3>
+        <button class="modal-close" id="mwModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="mwForm" novalidate>
+          <input type="hidden" id="mwEditId" />
+          <div class="form-grid">
+            <div class="form-group form-group--full">
+              <label for="mwTitle">Judul <span class="req">*</span></label>
+              <input type="text" id="mwTitle" placeholder="cth: Upgrade Kernel Web Server" />
+              <span class="field-err" id="mwErrTitle"></span>
+            </div>
+            <div class="form-group form-group--full">
+              <label for="mwDesc">Deskripsi / Scope Pekerjaan</label>
+              <textarea id="mwDesc" rows="2" placeholder="Rincian pekerjaan yang akan dilakukan..."></textarea>
+            </div>
+            <div class="form-group form-group--full">
+              <label for="mwServers">Server Terdampak <span class="req">*</span></label>
+              <div id="mwServerCheckboxes" class="mw-server-checkboxes"></div>
+              <span class="field-err" id="mwErrServers"></span>
+            </div>
+            <div class="form-group">
+              <label for="mwStart">Waktu Mulai <span class="req">*</span></label>
+              <input type="datetime-local" id="mwStart" />
+              <span class="field-err" id="mwErrStart"></span>
+            </div>
+            <div class="form-group">
+              <label for="mwEnd">Waktu Selesai <span class="req">*</span></label>
+              <input type="datetime-local" id="mwEnd" />
+              <span class="field-err" id="mwErrEnd"></span>
+            </div>
+            <div class="form-group">
+              <label for="mwType">Tipe Perubahan</label>
+              <select id="mwType">
+                <option value="Planned">Planned Maintenance</option>
+                <option value="Emergency">Emergency Maintenance</option>
+                <option value="Upgrade">Upgrade / Patch</option>
+                <option value="Migration">Migration</option>
+                <option value="Backup">Backup / Restore</option>
+                <option value="Config">Configuration Change</option>
+                <option value="Hardware">Hardware Replacement</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="mwPIC">PIC (Penanggung Jawab)</label>
+              <input type="text" id="mwPIC" placeholder="cth: Budi / Tim Infra" />
+            </div>
+            <div class="form-group">
+              <label for="mwRisk">Tingkat Risiko</label>
+              <select id="mwRisk">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+            </div>
+            <div class="form-group form-group--full">
+              <label for="mwRollback">Rollback Plan</label>
+              <textarea id="mwRollback" rows="2" placeholder="Langkah rollback jika pekerjaan gagal..."></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" id="mwFormCancel">Batal</button>
+            <button type="submit" class="btn-primary">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="mwDetailOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="mwDetailTitle">Detail Maintenance</h3>
+        <button class="modal-close" id="mwDetailClose">✕</button>
+      </div>
+      <div class="modal-body" id="mwDetailBody"></div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="app.js"></script>
+  <script src="maintenance.js"></script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ServerWatch — Analisis SNMP</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-name">ServerWatch</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item">
+        <span class="nav-icon">▦</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="snmp.html" class="nav-item active">
+        <span class="nav-icon">◉</span>
+        <span>Analisis SNMP</span>
+      </a>
+      <a href="profile.html" class="nav-item">
+        <span class="nav-icon">◈</span>
+        <span>Profil & Server</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="ops-badge">
+        <div class="ops-avatar" id="sidebarAvatar">IT</div>
+        <div class="ops-info">
+          <span class="ops-name" id="sidebarName">IT Ops</span>
+          <span class="ops-role">Administrator</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-sidebar" id="toggleSidebar">☰</button>
+        <div class="breadcrumb">
+          <span>Dashboard</span>
+          <span class="bc-sep">/</span>
+          <span class="bc-current">Analisis SNMP</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="live-clock" id="liveClock"></div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Page intro -->
+      <section class="snmp-intro">
+        <div class="snmp-intro-text">
+          <h1 class="snmp-page-title">Analisis Insiden SNMP</h1>
+          <p class="snmp-page-desc">Masukkan data telemetri SNMP dari server yang bermasalah. Sistem akan menganalisis metrik, mendeteksi anomali berdasarkan threshold, dan menghasilkan laporan insiden beserta rekomendasi mitigasi.</p>
+        </div>
+        <div class="snmp-intro-badges">
+          <span class="snmp-badge">SNMPv1</span>
+          <span class="snmp-badge">SNMPv2c</span>
+          <span class="snmp-badge">SNMPv3</span>
+          <span class="snmp-badge">SNMP Trap</span>
+        </div>
+      </section>
+
+      <!-- Two-column layout: form + result -->
+      <div class="snmp-layout">
+
+        <!-- ======= INPUT FORM ======= -->
+        <section class="snmp-form-section">
+          <div class="snmp-form-card">
+            <div class="snmp-form-title-row">
+              <h2 class="section-title">Data Telemetri SNMP</h2>
+              <div class="snmp-form-actions">
+                <button class="btn-ghost" id="btnFillDemo" title="Muat contoh data insiden">⚡ Demo</button>
+                <button class="btn-ghost btn-ghost--red" id="btnClearForm" title="Kosongkan semua field">✕ Reset</button>
+              </div>
+            </div>
+
+            <form id="snmpForm" novalidate>
+
+              <!-- Section: Identitas -->
+              <div class="snmp-fieldset">
+                <div class="snmp-fieldset-label">Identitas Perangkat</div>
+                <div class="snmp-field-row">
+                  <div class="form-group snmp-select-server-wrap">
+                    <label for="snmpSelectServer">Pilih dari Daftar Server</label>
+                    <select id="snmpSelectServer">
+                      <option value="">— Pilih server terdaftar (opsional) —</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="snmp-field-row snmp-field-row--2">
+                  <div class="form-group">
+                    <label for="snmpServerName">Nama Server <span class="req">*</span></label>
+                    <input type="text" id="snmpServerName" placeholder="cth: Web Server Utama" />
+                    <span class="field-err" id="snmpErrName"></span>
+                  </div>
+                  <div class="form-group">
+                    <label for="snmpIP">IP Address <span class="req">*</span></label>
+                    <input type="text" id="snmpIP" placeholder="cth: 192.168.1.10" />
+                    <span class="field-err" id="snmpErrIP"></span>
+                  </div>
+                </div>
+                <div class="snmp-field-row snmp-field-row--2">
+                  <div class="form-group">
+                    <label for="snmpSysDescr">Sistem Operasi / sysDescr</label>
+                    <input type="text" id="snmpSysDescr" placeholder="cth: Linux Ubuntu 22.04 x86_64" />
+                  </div>
+                  <div class="form-group">
+                    <label for="snmpVersion">Versi SNMP</label>
+                    <select id="snmpVersion">
+                      <option value="SNMPv2c">SNMPv2c</option>
+                      <option value="SNMPv1">SNMPv1</option>
+                      <option value="SNMPv3">SNMPv3</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="snmp-field-row snmp-field-row--2">
+                  <div class="form-group">
+                    <label for="snmpTimestamp">Waktu Polling (WIB) <span class="req">*</span></label>
+                    <input type="text" id="snmpTimestamp" placeholder="cth: 21-Nov-2026 11:20:00" />
+                    <span class="field-err" id="snmpErrTimestamp"></span>
+                  </div>
+                  <div class="form-group">
+                    <label for="snmpUptime">Uptime (sysUpTime)</label>
+                    <input type="text" id="snmpUptime" placeholder="cth: 12 hari 4 jam 30 menit" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section: Resource -->
+              <div class="snmp-fieldset">
+                <div class="snmp-fieldset-label">Metrik Resource (hrStorageTable / hrProcessorLoad)</div>
+                <div class="snmp-field-row">
+                  <div class="form-group snmp-slider-group">
+                    <label for="snmpCPU">Beban CPU — hrProcessorLoad: <strong id="snmpCPUVal">0</strong>%</label>
+                    <div class="snmp-slider-wrap">
+                      <input type="range" id="snmpCPU" min="0" max="100" value="0" class="snmp-slider" />
+                      <div class="slider-ticks">
+                        <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="snmp-field-row snmp-field-row--3">
+                  <div class="form-group">
+                    <label for="snmpRAMUsed">RAM Digunakan (GB) <span class="req">*</span></label>
+                    <input type="number" id="snmpRAMUsed" min="0" step="0.1" placeholder="cth: 13.6" />
+                    <span class="field-err" id="snmpErrRAM"></span>
+                  </div>
+                  <div class="form-group">
+                    <label for="snmpRAMTotal">RAM Total (GB) <span class="req">*</span></label>
+                    <input type="number" id="snmpRAMTotal" min="1" step="0.1" placeholder="cth: 16" />
+                  </div>
+                  <div class="form-group">
+                    <label>RAM Usage</label>
+                    <div class="resource-gauge-wrap">
+                      <div class="resource-gauge" id="ramGauge">
+                        <div class="resource-gauge-fill" id="ramGaugeFill"></div>
+                      </div>
+                      <span class="resource-gauge-pct" id="ramPct">—</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="snmp-field-row">
+                  <div class="form-group">
+                    <label for="snmpStorage">Detail Storage — hrStorageFixedDisk <span class="req">*</span></label>
+                    <textarea id="snmpStorage" rows="2" placeholder="cth: /dev/sda1: 180GB/200GB (90%) | /dev/sdb1: 50GB/500GB (10%)"></textarea>
+                    <span class="field-err" id="snmpErrStorage"></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section: Network -->
+              <div class="snmp-fieldset">
+                <div class="snmp-fieldset-label">Status Jaringan (ifTable — ifOperStatus / ifInOctets / ifOutOctets)</div>
+                <div class="snmp-field-row">
+                  <div class="form-group">
+                    <label for="snmpNetwork">Status & Traffic Interface</label>
+                    <textarea id="snmpNetwork" rows="2" placeholder="cth: eth0: UP, In: 850 Mbps, Out: 120 Mbps | eth1: DOWN"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section: SNMP Trap -->
+              <div class="snmp-fieldset">
+                <div class="snmp-fieldset-label">SNMP Trap / Alert</div>
+                <div class="snmp-field-row">
+                  <div class="form-group">
+                    <label for="snmpTrap">Pesan SNMP Trap Terbaru</label>
+                    <textarea id="snmpTrap" rows="2" placeholder="cth: linkDown on eth1 at 11:18:42 | Temperature threshold exceeded: 78°C"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section: Threshold override -->
+              <div class="snmp-fieldset snmp-fieldset--collapsible" id="thresholdFieldset">
+                <button type="button" class="snmp-fieldset-toggle" id="btnToggleThreshold">
+                  <span class="snmp-fieldset-label" style="margin:0">Ambang Batas (Threshold)</span>
+                  <span class="toggle-arrow" id="thresholdArrow">▸</span>
+                </button>
+                <div class="snmp-threshold-body" id="thresholdBody" style="display:none;">
+                  <div class="snmp-field-row snmp-field-row--3">
+                    <div class="form-group">
+                      <label for="thCPU">CPU Warning (%)</label>
+                      <input type="number" id="thCPU" value="80" min="1" max="100" />
+                    </div>
+                    <div class="form-group">
+                      <label for="thRAM">RAM Warning (%)</label>
+                      <input type="number" id="thRAM" value="85" min="1" max="100" />
+                    </div>
+                    <div class="form-group">
+                      <label for="thStorage">Storage Warning (%)</label>
+                      <input type="number" id="thStorage" value="90" min="1" max="100" />
+                    </div>
+                  </div>
+                  <p class="snmp-threshold-note">CRITICAL otomatis ditetapkan pada Threshold + 10%.</p>
+                </div>
+              </div>
+
+              <div class="snmp-form-submit">
+                <button type="submit" class="btn-primary btn-analyze" id="btnAnalyze">
+                  <span id="analyzeBtnText">▶ Jalankan Analisis</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ======= RESULT PANEL ======= -->
+        <section class="snmp-result-section" id="snmpResultSection">
+          <div class="snmp-result-placeholder" id="snmpResultPlaceholder">
+            <div class="result-placeholder-icon">◉</div>
+            <p>Hasil analisis SNMP akan muncul di sini setelah form diisi dan dijalankan.</p>
+          </div>
+          <div class="snmp-result-card" id="snmpResultCard" style="display:none;">
+            <!-- Header bar -->
+            <div class="result-header" id="resultHeader">
+              <div class="result-header-left">
+                <span class="result-urgency-badge" id="resultUrgencyBadge">—</span>
+                <div>
+                  <div class="result-server-name" id="resultServerName">—</div>
+                  <div class="result-meta" id="resultMeta">—</div>
+                </div>
+              </div>
+              <div class="result-header-right">
+                <button class="btn-ghost btn-print" id="btnPrintResult" title="Cetak / Simpan PDF">⎙ Cetak</button>
+                <button class="btn-ghost" id="btnCopyResult" title="Salin teks hasil analisis">⎘ Salin</button>
+              </div>
+            </div>
+
+            <!-- Metric summary cards -->
+            <div class="result-metrics" id="resultMetrics"></div>
+
+            <!-- Analysis sections -->
+            <div class="result-body" id="resultBody"></div>
+
+            <!-- Timestamp footer -->
+            <div class="result-footer" id="resultFooter"></div>
+          </div>
+        </section>
+
+      </div><!-- end .snmp-layout -->
+
+      <!-- Analysis History -->
+      <section class="snmp-history-section">
+        <div class="table-header">
+          <h2 class="section-title">Riwayat Analisis</h2>
+          <button class="btn-clear-log" id="btnClearHistory">Bersihkan</button>
+        </div>
+        <div class="snmp-history-list" id="snmpHistoryList">
+          <div class="log-empty">Belum ada riwayat analisis.</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+  <script src="snmp.js"></script>
+</body>
+</html>
